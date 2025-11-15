@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>The GD Friend — Follow GD Player</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    input, button {
+      background: #000;
+      color: #fff;
+      border: 1px solid #fff;
+      padding: 8px;
+      margin: 5px 0;
+    }
+    button {
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>The GD Friend</h1>
+  <div>
+    <label for="gdUsername">GD Ник игрока:</label><br />
+    <input type="text" id="gdUsername" placeholder="Введите ник">
+  </div>
+  <button id="followBtn">Follow</button>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('SW зарегистрирован'))
+        .catch(console.error);
+    } else {
+      alert('Service Worker не поддерживается.');
+    }
+
+    const followBtn = document.getElementById('followBtn');
+    followBtn.addEventListener('click', async () => {
+      const username = document.getElementById('gdUsername').value.trim();
+      if (!username) {
+        alert('Введите ник игрока');
+        return;
+      }
+
+      const permission = await Notification.requestPermission();
+      if (permission !== 'granted') {
+        alert('Нужно разрешение на уведомления');
+        return;
+      }
+
+      // Отправляем username в SW
+      navigator.serviceWorker.controller.postMessage({
+        type: 'FOLLOW_PLAYER',
+        username
+      });
+    });
+  </script>
+</body>
+</html>
